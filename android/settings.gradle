@@ -1,0 +1,3 @@
+rootProject.name = 'TrabalhoPosAndroid'
+
+include ':app'
