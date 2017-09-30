@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import {GOOGLE_KEY} from './../config/config.json';
+import {checkPermission} from 'react-native-android-permissions';
 
 const BASE_URL = 'https://maps.googleapis.com/maps/api/place/';
 
@@ -24,7 +25,8 @@ class Place {
                 let URL = BASE_URL 
                             + 'textsearch/json?query=' + textoBusca 
                             + '&location=' + state.latitude + ',' + state.longitude 
-                            + '&key=' + GOOGLE_KEY;
+                            + '&key=' + GOOGLE_KEY
+                            + '&language=pt-BR';
                 axios.get(URL).then((response) => {
                     resolve(response.data.results);
                 }).catch(error);
@@ -39,14 +41,24 @@ class Place {
                 return;
             }
             navigator.geolocation.getCurrentPosition((position) => {
+                console.log(position);
                 this.state.latitude = position.coords.latitude;
                 this.state.longitude = position.coords.longitude;
                 resolve(this.state);
             }, (error) => {
                 console.log(error);
-                alert('Ocorreu um erro interno ao capturar localização atual. Contate o fornecedor de software.');
-                reject(error);
-            }, { enableHighAccuracy: true });
+                checkPermission("android.permission.ACCESS_FINE_LOCATION").then((result) => {
+                    console.log(result);
+                    this.state.latitude = result.coords.latitude;
+                    this.state.longitude = result.coords.longitude;
+                    resolve(this.state);
+                }, (result) => {
+                    console.log(result);
+                    alert('Ocorreu um erro interno ao capturar localização atual. Contate o fornecedor de software.');
+                    reject(error);
+                });
+                
+            }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000 });
         });
     };
 }

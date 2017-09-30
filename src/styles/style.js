@@ -16,12 +16,22 @@ export default StyleSheet.create({
       height: 100,
       flex: 1
   },
+  bigimage: {
+      alignSelf: 'stretch',
+      height: 200,
+      padding: 3
+  },
   local: {
+      alignSelf: 'stretch',
       height: 100,
-      width: 100,
+      width: 160,
       flex: 1,
   },
   flexible: {
     flex: 1
+  },
+  localStretch: {
+      alignSelf: 'stretch',
+      height: 200
   }
 });

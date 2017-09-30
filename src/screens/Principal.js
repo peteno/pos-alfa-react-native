@@ -80,7 +80,6 @@ class Principal extends Component {
         if (!this.state.itemModal) {
             return (<View></View>);
         }
-        console.log(this.state.mapRegion);
         return (
             <Modal
                 visible={this.state.exibirModal}
@@ -90,11 +89,12 @@ class Principal extends Component {
                     <Text style={{ fontSize: 24, padding: 10, textAlign: 'center' }}>
                         {this.state.itemModal.name}
                     </Text>
-                    <Text style={{ marginTop: 15, marginBotton: 15, textAlign: 'center' }}>
+                    {this.mountPhotoForItem(this.state.itemModal, 500, styles.bigimage, styles.localStretch)}
+                    <Text style={{ marginTop: 15, marginBottom: 15, textAlign: 'center' }}>
                         {this.state.itemModal.formatted_address}
                     </Text>
                     <MapView
-                        style={{ alignSelf: 'stretch', height: 200, padding: 3 }}
+                        style={styles.bigimage}
                         region={this.state.mapRegion}
                         >
                         <MapView.Marker
@@ -125,6 +125,22 @@ class Principal extends Component {
     onChangebusca = (busca) => {
         this.setState({ busca });
     };
+
+    mountPhotoForItem = (item, maxSize, styleView, styleImage) => {
+        if (!item.photos || item.photos.length === 0) {
+            return (
+                <View></View>
+            );
+        }
+        URL = Place.BASE_URL + 'photo?maxwidth='+(maxSize || 100)+'&photoreference=' + item.photos[0].photo_reference + '&key=' + Place.GOOGLE_KEY;
+        return (
+            <View 
+                visible={URL !== null}
+                style={styleView} >
+                {item.photos ? <Image style={styleImage} source={{ uri: URL }} /> : null}
+            </View>
+        );
+    };
     
     result = () => {
         if (this.state.buscando) {
@@ -136,27 +152,10 @@ class Principal extends Component {
         let content;
         if (this.state.locais) {
             content = this.state.locais.map((item, index) => {
-                
-                let PHOTO = () => {
-                    if (!item.photos || item.photos.length === 0) {
-                        return (
-                            <View></View>
-                        );
-                    }
-                    URL = Place.BASE_URL + 'photo?maxwidth=100&photoreference=' + item.photos[0].photo_reference + '&key=' + Place.GOOGLE_KEY;
-                    return (
-                        <View 
-                            visible={URL !== null}
-                            style={styles.picture} >
-                            {item.photos ? <Image style={styles.local} source={{ uri: URL }} /> : null}
-                        </View>
-                    );
-                };
-                
                 return (
                     <View key={index} style={styles.flexible}>
                         <TouchableOpacity style={styles.itens} onPress={() => this.openModal(item)}>
-                            {PHOTO()}
+                            {this.mountPhotoForItem(item, 100, styles.picture, styles.local)}
                             <View style={{ flex: 1 }}>
                                 <Text>{item.name}</Text>
                                 <Text>{item.formatted_address}</Text>
